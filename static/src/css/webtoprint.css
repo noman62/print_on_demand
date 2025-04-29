@@ -1,0 +1,45 @@
+
+.wk_loader{
+    display:none;
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: url(/print_on_demand/static/img/wkloader.gif) center no-repeat rgba(255, 255, 255, 0.5);
+    text-shadow: 0 1px 1px white;
+  }
+
+
+.Arial{font-family:"Arial";}
+.Helvetica{font-family:"Helvetica";}
+.MyriadPro{font-family:"Myriad Pro";}
+.Delicious{font-family:"Delicious";}
+.Verdana{font-family:"Verdana";}
+.Georgia{font-family:"Georgia";}
+.Courier{font-family:"Courier";}
+.ComicSansMS{font-family:"Comic Sans MS";}
+.Impact{font-family:"Impact";}
+.Monaco{font-family:"Monaco";}
+.Optima{font-family:"Optima";}
+.HoeflerText{font-family:"Hoefler Text";}
+.Plaster{font-family:"Plaster";}
+.Engagement{font-family:"Engagement";}
+
+.nav-link.wk-img.active {
+    border: 1px solid #3F3F3F;
+    box-sizing: border-box;
+}
+.nav-link.active.wk-img + span {
+  color:black;
+}
+
+@media (max-width: 360px) {
+  .badge.rounded-pill.bg-primary{
+    font-size:0.5rem;
+ }
+ .badge.rounded-pill.bg-primary span{
+  display:block;
+}
+}

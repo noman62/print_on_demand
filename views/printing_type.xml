@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!--    Printing Type tree view-->
+    <record id="printing_type_view_tree" model="ir.ui.view">
+        <field name="name">printing.type.view.tree</field>
+        <field name="model">printing.type</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="description"/>
+                <field name="special_note"/>
+                <field name="pricing_type"/>
+            </tree>
+        </field>
+    </record>
+    <!--    Printing Type form view-->
+    <record id="printing_type_view_form" model="ir.ui.view">
+        <field name="name">printing.type.view.form</field>
+        <field name="model">printing.type</field>
+        <field name="arch" type="xml">
+            <form string="Printing Type">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="currency_id" invisible="1"/>
+                            <field name="name"/>
+                            <field name="special_note"/>
+                            <field name="pricing_type"/>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                            <field name="setup_price"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Printing Type Line" invisible="pricing_type != 'fixed_price'">
+                            <field name="printing_type_line_ids">
+                                <tree string="Fixed Price" editable="bottom">
+                                    <!-- Fields to be displayed in the tree view of Printing Type Line -->
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="min_product"/>
+                                    <field name="price"/>
+                                    <field name="print_sides_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Printing Type Line" invisible="pricing_type != 'compute_price_based_on_elements'">
+                            <field name="printing_type_line_ids">
+                                <tree string="Price Based on Elements" editable="bottom">
+                                    <!-- Fields to be displayed in the tree view of Printing Type Line -->
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="min_product"/>
+                                    <field name="text_charge"/>
+                                    <field name="image_charge"/>
+                                    <field name="clipart_charge"/>
+                                    <field name="name_and_number_charge"/>
+                                    <field name="print_sides_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                        <page string="Printing Type Line" invisible="pricing_type != 'compute_price_based_on_colors'">
+                            <field name="printing_type_line_ids">
+                                <tree string="Price Based on Elements" editable="bottom">
+                                    <!-- Fields to be displayed in the tree view of Printing Type Line -->
+                                    <field name="currency_id" column_invisible="True"/>
+                                    <field name="min_product"/>
+                                    <field name="color_1"/>
+                                    <field name="color_2"/>
+                                    <field name="color_3"/>
+                                    <field name="color_4"/>
+                                    <field name="color_5"/>
+                                    <field name="color_6"/>
+                                    <field name="print_sides_id"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <!--    Printing Type menu action-->
+    <record id="action_printing_type" model="ir.actions.act_window">
+        <field name="name">Printing Type</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">printing.type</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+</odoo>

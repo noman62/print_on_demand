@@ -1,0 +1,652 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <template id="custom_product" name="Custom Product">
+        <t t-set="active_area" t-value="None"/>
+        <t t-set="area_found" t-value="False"/>
+        <t t-foreach="product.custom_area_ids" t-as="area">
+            <t t-if="not area_found">
+                <t t-if="product in area.product_variant_ids">
+                    <t t-set="active_area" t-value="area.sequence"/>
+                    <t t-set="area_found" t-value="True"/>
+                </t>
+            </t>
+        </t>
+
+        <t t-call="website.layout">
+            <style>
+                .vertical-sidebar {
+                height: 100%;
+                min-height: 600px;
+                padding: 15px 0;
+                background-color: #22c3e5; /* Turquoise blue color like in your example */
+                }
+                .sidebar-item {
+                padding: 10px;
+                cursor: pointer;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                margin-bottom: 20px;
+                color: white;
+                }
+                .sidebar-item:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+                }
+                .sidebar-item i {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+                }
+                .content-panel {
+                height: 100%;
+                min-height: 600px;
+                background-color: #eef1f4; /* Light gray color like in your example */
+                position: relative;
+                }
+                .scrollable-content {
+                height: calc(100% - 100px);
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding-right: 10px;
+                }
+                .design-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+                }
+                .design-item {
+                border: 1px solid #e0e0e0;
+                background-color: white;
+                }
+                .design-item img {
+                width: 100%;
+                height: auto;
+                }
+                /* Custom scrollbar */
+                .scrollable-content::-webkit-scrollbar {
+                width: 6px;
+                }
+                .scrollable-content::-webkit-scrollbar-track {
+                background: #f1f1f1;
+                }
+                .scrollable-content::-webkit-scrollbar-thumb {
+                background: #888;
+                border-radius: 3px;
+                }
+                .scrollable-content::-webkit-scrollbar-thumb:hover {
+                background: #555;
+                }
+                .active-item {
+                background-color: rgba(255, 255, 255, 0.3);
+                position: relative;
+                }
+                .active-item::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                right: 0;
+                height: 100%;
+                width: 3px;
+                background-color: white;
+                }
+                /* Modified quantity selection styles */
+                .size-quantity {
+                width: 100%;
+                max-width: 300px; /* Reduced overall width */
+                }
+                .size-row {
+                display: flex;
+                align-items: center;
+                margin-bottom: 10px;
+                }
+                .size-label {
+                width: 40px;
+                font-weight: bold;
+                flex-shrink: 0;
+                }
+                .quantity-control {
+                display: flex;
+                width: 180px; /* Fixed width for all quantity controls */
+                flex-shrink: 0;
+                }
+                .quantity-btn {
+                width: 40px;
+                height: 40px;
+                border: none;
+                background-color: #0b6e6e;
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+                }
+                .quantity-btn.decrease {
+                border-radius: 4px 0 0 4px;
+                }
+                .quantity-btn.increase {
+                border-radius: 0 4px 4px 0;
+                }
+                .wk_canvas {
+                border: 1px solid #ddd;
+                margin-bottom: 15px;
+                }
+                .wk_canvas.active {
+                border: 1px solid grey;
+                }
+                .quantity-input {
+                width: 100px; /* Fixed width for input field */
+                height: 40px;
+                text-align: center;
+                border: 1px solid #ccc;
+                border-left: none;
+                border-right: none;
+                }
+                /* New styles for top navigation bar - simplified */
+                .top-nav-bar {
+                background-color: #22c3e5;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 8px 15px;
+                color: white;
+                margin-bottom: 0;
+                }
+                .editor-tools {
+                display: flex;
+                align-items: center;
+                }
+                .editor-tool {
+                padding: 5px 10px;
+                margin-right: 5px;
+                background-color: transparent;
+                border: none;
+                color: white;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                }
+                .editor-tool:hover {
+                background-color: rgba(255, 255, 255, 0.2);
+                }
+                .action-buttons {
+                display: flex;
+                align-items: center;
+                }
+                .action-buttons .btn {
+                margin-left: 10px;
+                }
+                .btn-preview {
+                background-color: #E74C3C;
+                color: white;
+                border: none;
+                padding: 8px 15px;
+                }
+
+                /* Custom curved arrow styles */
+                .curved-arrow {
+                width: 24px;
+                height: 24px;
+                stroke: white;
+                stroke-width: 2.5;
+                fill: none;
+                }
+
+                /* Flip the redo arrow horizontally */
+                .redo-arrow {
+                transform: scaleX(-1);
+                }
+                .close-btn {
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                margin-left: 15px;
+                }
+                /* Remove spacing below breadcrumb */
+                .breadcrumb-row {
+                margin-bottom: 0;
+                }
+                /* Remove spacing between top bar and content */
+                .container.oe_website_sale {
+                padding-top: 0;
+                }
+                .row.g-0 {
+                margin-top: 0;
+                }
+                .divider {
+                height: 30px;
+                width: 1px;
+                background-color: rgba(255, 255, 255, 0.5);
+                margin: 0 10px;
+                }
+                .font-preview-grid {
+                width: 100%;
+                }
+
+                .font-preview-card {
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                padding: 10px;
+                cursor: pointer;
+                transition: all 0.2s;
+                height: 100%;
+                }
+
+                .font-preview-card:hover {
+                border-color: #007bff;
+                box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+                }
+
+                .font-preview-card.selected {
+                border: 2px solid #007bff;
+                background-color: #f0f8ff;
+                }
+
+                .font-preview-content {
+                min-height: 50px;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                }
+
+                /* Color palette styles */
+                .color-palette {
+                width: 100%;
+                }
+
+                .color-options {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 5px;
+                }
+
+                .color-option {
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                cursor: pointer;
+                border: 2px solid #ddd;
+                transition: all 0.2s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                }
+
+                .color-option:hover {
+                transform: scale(1.1);
+                border-color: #007bff;
+                }
+
+                .color-option.selected {
+                border: 2px solid #000;
+                box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+                }
+
+                .custom-color {
+                background-color: #fff;
+                border: 2px dashed #ddd;
+                color: #666;
+                }
+            </style>
+
+            <div class="wk_loader"></div>
+            <div class="modal fade" id="preview-design-modal">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Preview</h4>
+                            <span type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                X
+                            </span>
+                        </div>
+                        <div class="modal-body justify-content-center">
+                            <img class="mx-auto img-fluid" src="" alt=""/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="add-to-cart-modal">
+                <t t-set="combination" t-value="product.product_tmpl_id._get_first_possible_combination()"/>
+                <t t-set="combination_info"
+                   t-value="product.product_tmpl_id._get_combination_info(combination, add_qty=add_qty or 1)"/>
+                <t t-set="product_variant" t-value="product"/>
+
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h4 class="modal-title bold">Add to cart</h4>
+                            <span type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                                X
+                            </span>
+                        </div>
+                        <div class="modal-body container oe_website_sale">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col col-7 mx-auto"></div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col col-5 d-flex justify-content-center mx-auto"></div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <form action="/shop/cart/update" method="POST">
+                                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                        <div class="js_product js_main_product">
+                                            <t t-placeholder="select">
+                                                <input type="hidden" class="product_id" name="product_id"
+                                                       t-att-value="product.id"/>
+                                                <input type="hidden" class="product_template_id"
+                                                       name="product_template_id"
+                                                       t-att-value="product.product_tmpl_id.id"/>
+                                                <input type="hidden" name="print_on_demand_order" id="" value="True"/>
+                                                <t t-foreach="product.custom_area_ids" t-as="area">
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_design"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_text"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_image"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_image_name"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_printing_type"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_number_of_colors"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_players"/>
+                                                    <input type="hidden"
+                                                           t-attf-name="print_on_demand_area_{{area.id}}_bulk"/>
+                                                </t>
+                                            </t>
+                                            <h4>
+                                                <span t-field="product.name"/>
+                                            </h4>
+                                            <h4 t-if="not product.product_template_attribute_value_ids"
+                                                class="oe_price_h4 css_editable_mode_hidden">
+                                                <span t-attf-class="text-danger oe_default_price {{'' if combination_info['has_discounted_price'] else 'd-none'}}"
+                                                      style="text-decoration: line-through; white-space: nowrap;"
+                                                      t-esc="product.lst_price"
+                                                      t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                                                <b class="oe_price" style="white-space: nowrap;"
+                                                   t-esc="product.lst_price"
+                                                   t-options="{'widget': 'monetary', 'display_currency': website.currency_id}"/>
+                                                <span itemprop="price" style="display:none;" t-esc="product.lst_price"/>
+                                                <span itemprop="priceCurrency" style="display:none;"
+                                                      t-esc="website.currency_id.name"/>
+                                            </h4>
+                                            <p t-if="True" class="css_not_available_msg alert alert-warning">This
+                                                combination does not exist.
+                                            </p>
+                                            <div t-if="not product.product_template_attribute_value_ids"
+                                                 class="css_quantity input-group" contenteditable="false">
+                                                <div class="input-group-prepend pe-1">
+                                                    <a t-attf-href="#" class="btn btn-secondary js_add_cart_json"
+                                                       aria-label="Remove one" title="Remove one">
+                                                        <i class="fa fa-minus"></i>
+                                                    </a>
+                                                </div>
+                                                <input type="text" class="form-control text-center quantity"
+                                                       data-min="1" name="add_qty" t-att-value="add_qty or 1"/>
+                                                <div class="input-group-append ps-1">
+                                                    <a t-attf-href="#"
+                                                       class="btn btn-secondary float_left js_add_cart_json"
+                                                       aria-label="Add one" title="Add one">
+                                                        <i class="fa fa-plus"></i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="form-check mt8 mb8" t-if="wtp_tnc">
+                                                <input required="required" class="form-check-input web-to-print-confirm"
+                                                       type="checkbox"/>
+                                                <span class="" for="defaultCheck1">
+                                                    <t t-esc="wtp_tnc"/>
+                                                </span>
+                                            </div>
+                                            <a role="button" id="buy_now"
+                                               t-att-class="'%s btn btn-primary mt16 js_check_product a-submit d-block d-sm-inline-block'%('disabled' if wtp_tnc else '')"
+                                               href="#">
+                                                <i class="fa fa-shopping-cart"/>Add to Cart
+                                            </a>
+                                            <div id="product_option_block"/>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <section class="container oe_website_sale">
+                <div class="row mt16 breadcrumb-row">
+                    <div class="col-md-8">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a t-att-href="keep(category=0)">Products</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a t-att-href="keep('/shop/product/%s' % slug(product.product_tmpl_id) ,category=0)">
+                                    <t t-esc="product.product_tmpl_id.name"/>
+                                </a>
+                            </li>
+                            <li t-if="category" class="breadcrumb-item">
+                                <a t-att-href="keep('/shop/category/%s' % slug(category), category=0)"
+                                   t-field="category.name"/>
+                            </li>
+                            <li class="breadcrumb-item active">
+                                <span t-field="product.name"/>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+
+                <!-- Simplified Top Navigation Bar with Just Undo/Redo -->
+                <div class="top-nav-bar">
+                    <div class="editor-tools">
+                        <!-- Left side tools could go here -->
+                    </div>
+                    <div class="action-buttons">
+                        <div class="editor-tools">
+                            <button class="editor-tool" title="Undo">
+                                <svg class="curved-arrow" viewBox="0 0 24 24">
+                                    <path d="M7 14c0-4.5 3.5-8 8-8 4.5 0 8 3.5 8 8"></path>
+                                    <polyline points="7 10 7 14 11 14"></polyline>
+                                </svg>
+                            </button>
+                            <button class="editor-tool" title="Redo">
+                                <svg class="curved-arrow redo-arrow" viewBox="0 0 24 24">
+                                    <path d="M7 14c0-4.5 3.5-8 8-8 4.5 0 8 3.5 8 8"></path>
+                                    <polyline points="7 10 7 14 11 14"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                        <button id="preview-design-top" class="btn btn-preview">
+                            <i class="fa fa-eye"></i>
+                            Preview
+                        </button>
+                        <button id="add-to-cart-top" class="btn btn-primary">
+                            <i class="fa fa-shopping-cart"></i>
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row g-0">
+                    <div class="col-md-1 pe-0">
+                        <div class="vertical-sidebar">
+                            <div class="sidebar-item" data-panel-type="product">
+                                <i class="fa fa-tshirt"></i>
+                                <span>Product</span>
+                            </div>
+                            <div class="sidebar-item" data-panel-type="layers">
+                                <i class="fa fa-layer-group"></i>
+                                <span>Layers</span>
+                            </div>
+                            <div class="sidebar-item" data-panel-type="upload">
+                                <i class="fa fa-upload"></i>
+                                <span>Upload</span>
+                            </div>
+                            <div class="sidebar-item" data-panel-type="text">
+                                <i class="fa fa-font"></i>
+                                <span>Text</span>
+                            </div>
+                            <div class="sidebar-item" data-panel-type="clipart">
+                                <i class="fa fa-smile"></i>
+                                <span>Clipart</span>
+                            </div>
+                            <div class="sidebar-item" data-panel-type="quick">
+                                <i class="fa fa-bolt"></i>
+                                <span>Quick</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 ps-0">
+                        <div class="content-panel p-3">
+                            <div class="scrollable-content">
+                                <div class="design-grid">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-8">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="tab-content text-center">
+                                    <t t-foreach="product.custom_area_ids" t-as="area">
+                                        <t t-if="product in area.product_variant_ids">
+                                            <div role="tabpanel" t-att-data-area-id="area.id"
+                                                 t-att-class="'tab-pane wk_canvas active' if area.sequence == active_area else 'tab-pane wk_canvas' "
+                                                 t-attf-id="area_{{area.id}}"
+                                                 style=" position: relative; background-color: rgb(255, 255, 255);">
+                                                <span class="img-canvas" t-field="area.web_image"
+                                                      t-options="{'widget':'image'}"></span>
+                                                <div class="border border-dark drawingArea"
+                                                     t-attf-style="position: absolute;top:{{int(float(area.top))}}px;left:{{int(float(area.left))}}px;z-index: 10;width:{{int(float(area.width))}}px;height:{{int(float(area.height))}}px;">
+                                                    <canvas t-att-data-area-id="area.id" t-attf-id="tcanvas_{{area.id}}"
+                                                            t-att-width="int(float(area.width))"
+                                                            t-att-height="int(float(area.height))" class="hover"
+                                                            style="-webkit-user-select: none;position:absolute;"></canvas>
+                                                </div>
+                                            </div>
+                                        </t>
+                                    </t>
+                                </div>
+                                <ul class="nav justify-content-center mt16 mb16">
+                                    <t t-foreach="product.custom_area_ids" t-as="area">
+                                        <t t-if="product in area.product_variant_ids">
+                                            <li class="nav-item border ml8 mr8">
+                                                <a t-att-data-area-id="area.id" data-bs-toggle="tab" role="tab"
+                                                   t-att-class="'nav-link wk-img active ' if area.sequence == active_area else 'nav-link wk-img'"
+                                                   t-attf-href="#area_{{area.id}}">
+                                                    <img t-att-src="image_data_uri(area.web_image)"
+                                                         style="width:50px;height:50px;"/>
+                                                </a>
+                                                <span class="d-flex justify-content-center"
+                                                      style="background-color:rgba(0, 0, 0, 0.03);" t-esc="area.name"/>
+                                            </li>
+                                        </t>
+                                    </t>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </t>
+    </template>
+
+    <template id="template_id" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='add_to_cart_wrap']" position="after">
+            <div class="d-inline-flex align-items-center mb-2 me-auto">
+                <a t-if="product.is_print_on_demand" role="button" id="customize-link"
+                   t-attf-class="btn btn-outline-primary ms-1" href="#">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                         class="bi bi-images" viewBox="0 0 16 16">
+                        <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                        <path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1zM2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1h-10z"/>
+                    </svg>
+                    <span style="font-weight:bold">Customize</span>
+                </a>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="show_design_lines" name="Design Lines Template">
+        <button data-bs-toggle="modal" t-attf-data-bs-target="#design{{line.id}}" class="badge rounded-pill bg-primary">
+            <span>View Customized</span>
+            <span>Design</span>
+        </button>
+        <div class="modal fade" t-attf-id="design{{line.id}}">
+            <t t-set="first_image" t-value="min(line.design_line_ids.mapped('id'))"/>
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Preview</h4>
+                        <span type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                            X
+                        </span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="tab-content mb8 mt8 mx-auto">
+                            <t t-foreach="line.design_line_ids" t-as="design">
+                                <div role="tabpanel" t-attf-id="design_{{design.id}}"
+                                     t-att-class="'tab-pane active' if design.id == first_image else 'tab-pane'">
+                                    <img t-att-src="image_data_uri(design.design)" class="mx-auto img-thumbnail"
+                                         alt=""/>
+                                </div>
+                            </t>
+                        </div>
+                        <ul class="nav justify-content-center mr8 ml8">
+                            <t t-foreach="line.design_line_ids" t-as="design">
+                                <li class="nav-item">
+                                    <a data-bs-toggle="tab" role="tab"
+                                       t-att-class="'nav-link wk-img active' if design.id == first_image else 'wk-img nav-link'"
+                                       t-attf-href="#design_{{design.id}}">
+                                        <img t-att-src="image_data_uri(design.design)" style="width:50px;height:50px;"/>
+                                    </a>
+                                    <span class="d-flex justify-content-center"
+                                          style="background-color:rgba(0, 0, 0, 0.03);" t-esc="design.name"/>
+                                </li>
+                            </t>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="print_on_demand_inherit_products_item" inherit_id="website_sale.products_item"
+              name="Print On Demand Products item">
+        <xpath expr="//div[hasclass('oe_product_image')]/.." position="inside">
+            <img t-if="product.is_print_on_demand" title="Customization Available on this product" class="pull-right"
+                 style="z-index: 5; overflow: hidden; position: absolute; top: 0; bottom: auto; right: 0;"
+                 src="/print_on_demand/static/img/Edit.png"/>
+        </xpath>
+    </template>
+
+    <template id="cart_lines_inherit" name="template_name" inherit_id="website_sale.cart_lines">
+        <xpath expr="//t[@t-call='website_sale.cart_line_description_following_lines']" position="after">
+            <t t-if="line.print_on_demand_line and line.design_line_ids" t-call="print_on_demand.show_design_lines"/>
+        </xpath>
+    </template>
+
+    <template id="sale_order_portal_content_inherit" inherit_id="sale.sale_order_portal_content">
+        <xpath expr="//section[@id='details']//td[@id='product_name']" position="inside">
+            <t t-if="line.print_on_demand_line and line.design_line_ids" t-call="print_on_demand.show_design_lines"/>
+        </xpath>
+    </template>
+
+    <template id="cart_summary_print_on_demand" name="Cart Summary Print On Demand"
+              inherit_id="website_sale.checkout_layout">
+        <xpath expr="//td[@name='website_sale_cart_summary_product_name']" position="inside">
+            <t t-if="line.print_on_demand_line and line.design_line_ids" t-call="print_on_demand.show_design_lines"/>
+        </xpath>
+    </template>
+
+</odoo>

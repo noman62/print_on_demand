@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data noupdate="0">
+        <!-- Add you code here -->
+        <record id="product_template_form_view_print_on_demand" model="ir.ui.view">
+            <field name="name">product.template.view.form.inherit</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_form_view"/>
+            <field name="arch" type="xml">
+                <div name="options" position="inside">
+                    <div>
+                        <field name="is_print_on_demand"/>
+                        <label for="is_print_on_demand"/>
+
+                        <field name="is_setup_service" invisible="is_custom_service == True or detailed_type != 'service'"/>
+                        <label for="is_setup_service" invisible="is_custom_service == True or detailed_type != 'service'"/>
+
+                        <field name="is_custom_service" invisible="is_setup_service == True or detailed_type != 'service'"/>
+                        <label for="is_custom_service" invisible="is_setup_service == True or detailed_type != 'service'"/>
+                    </div>
+                </div>
+                <xpath expr="//page[@name='inventory']" position="after">
+                    <page name="print_on_demand_options" string="Print On Demand" invisible="is_print_on_demand == False">
+                        <separator string="Add customizable area"/>
+                        <field string="Select Design Area" name="custom_area_ids"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+        <record id="product_custom_area_view_form" model="ir.ui.view">
+            <field name="name">model.name.view.form</field>
+            <field name="model">product.custom.area</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                    <div class="oe_title">
+                        <label class="oe_edit_only" for="name" string="Name"/>
+                        <h1><field placeholder="area name" name="name" /></h1>
+                        <!-- <field name="sequence" /> -->
+                        <div>
+                            <field name="print_side_id" placeholder="Select Side"/>
+                        </div>
+                        <div>
+                            <field name="provide_image"/>
+                            <label for="provide_image"/>
+                        </div>
+                        <div>
+                            <field name="provide_text"/>
+                            <label for="provide_text"/>
+                        </div>
+                        <div>
+                            <field name="product_id" invisible="1"/>
+                            <label for="product_variant_ids"/>
+                            <field name="product_variant_ids" widget="many2many_tags"/>
+                        </div>
+                        <div>
+                            <field name="provide_printing_types"/>
+                            <label for="provide_printing_types"/>
+                        </div>
+                        <div>
+                            <field name="printing_type_ids" widget="many2many_tags" invisible="provide_printing_types != True" placeholder="Select Printing Type"/>
+                        </div>
+                        <div>
+                            <field name="provide_team_members"/>
+                            <label for="provide_team_members"/>
+                        </div>
+                        <div>
+                            <field name="is_bulk_ordering"/>
+                            <label for="is_bulk_ordering"/>
+                        </div>
+                    </div>
+                        <notebook string="Define Area">
+                            <page string="Define Area">
+                            <div class="text-danger"><b>NOTE:</b> Give 500x500 image for better customization</div>
+                                <center>
+                                    <field name="height" invisible="1" force_save="1" />
+                                    <field name="width" invisible="1" force_save="1"/>
+                                    <field name="top" invisible="1" />
+                                    <field name="left" invisible="1" force_save="1"/>
+                                    <field help="Give 500x500 image for better customization" name="web_image"  widget="area_select" required="1"/>
+                                </center>
+                            </page>
+                            <page string="Note">
+                                <field name="note" placeholder="Add note here" />
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_custom_area_view_tree" model="ir.ui.view">
+            <field name="name">model.name.view.tree</field>
+            <field name="model">product.custom.area</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="sequence" widget="handle" />
+                    <field name="name" />
+                    <field name="provide_text"/>
+                    <field name="provide_image"/>
+                    <field name="product_variant_ids" widget="many2many_tags"/>
+                    <field name="provide_team_members"/>
+                    <field name="is_bulk_ordering"/>
+                </tree>
+            </field>
+        </record>
+        
+        <record id="print_on_demand_product_template_action" model="ir.actions.act_window">
+            <field name="name">Products</field>
+            <field name="res_model">product.template</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('is_print_on_demand','=',True)]</field>
+            <field name="context">{'default_is_print_on_demand':True}</field>
+        </record>
+
+        <record id="product_attribute_form_view_web_to_print" model="ir.ui.view">
+            <field name="name">product.attribute.view.form.inherit</field>
+            <field name="model">product.attribute</field>
+            <field name="inherit_id" ref="product.product_attribute_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='visibility']" position="after">
+                    <field name="is_size_attribute_for_customizable_products"/>
+                </xpath>
+            </field>
+        </record>
+        
+        <menuitem
+            id="print_on_demand_product_template_menu"
+            name="Products"
+            action="print_on_demand_product_template_action"
+            parent="print_on_demand_menu"
+            sequence="20"/>
+        
+    </data>
+</odoo>

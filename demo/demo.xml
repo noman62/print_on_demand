@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+      <record id="wk_t_shirts" model="product.public.category">
+        <field name="name">T-Shirts</field>
+        <field name="sequence">115</field>
+      </record>
+
+     <record id="product4_wk" model="product.product">
+        	<field name="name">White Men T-Shirt</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="standard_price">439.0</field>
+            <field name="list_price">509.0</field>
+            <field name="type">consu</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="description_sale">
+            	Fabric: Cotton
+				Sleeves: SHORT SLEEVES
+				Fit: Regular
+				Color: White
+				Wash Care: Gentle Wash
+				Style: Solid
+			</field>
+            <field name="default_code">WK-TSHIRT</field>
+            <field name="website_published" eval="True"/>
+            <field name="website_size_x">1</field>
+            <field name="website_size_y">1</field>
+            <field name="website_sequence">3</field>
+            <field name="public_categ_ids" eval="[(6,0,[ref('wk_t_shirts')])]"/>
+            <field name="image_1920" type="base64" file="print_on_demand/static/img/wtptshirt.jpg"/>
+      </record>
+
+      <record id="service_charge" model="product.public.category">
+          <field name="name">Service Charge</field>
+          <field name="sequence">116</field>
+      </record>
+
+      <record id="product5_wk" model="product.product">
+        	<field name="name">Service Charge</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="standard_price">0.0</field>
+            <field name="list_price">0.0</field>
+            <field name="type">service</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="is_custom_service" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="image_1920" type="base64" file="print_on_demand/static/img/service.png"/>
+            <field name="public_categ_ids" eval="[(6,0,[ref('service_charge')])]"/>
+      </record>
+
+      <record id="setup_charge" model="product.public.category">
+          <field name="name">Setup Charge</field>
+          <field name="sequence">117</field>
+      </record>
+
+      <record id="product6_wk" model="product.product">
+        	<field name="name">Setup Charge</field>
+            <field name="categ_id" ref="product.product_category_all"/>
+            <field name="standard_price">0.0</field>
+            <field name="list_price">0.0</field>
+            <field name="type">service</field>
+            <field name="sale_ok" eval="True"/>
+            <field name="is_setup_service" eval="True"/>
+            <field name="purchase_ok" eval="False"/>
+            <field name="uom_id" ref="uom.product_uom_unit"/>
+            <field name="image_1920" type="base64" file="print_on_demand/static/img/setup.png"/>
+            <field name="public_categ_ids" eval="[(6,0,[ref('setup_charge')])]"/>
+      </record>
+      
+      <record id="custom_area_1" model="product.custom.area">
+        <field name="name">Front</field>
+        <field name="width">200</field>
+        <field name="height">200</field>
+        <field name="left">157</field>
+        <field name="top">71</field>
+        <field name="web_image" type="base64" file="print_on_demand/static/img/wtptshirt.jpg"/>
+      </record>
+
+      <record id="product4_wk" model="product.product">
+            <field name="custom_area_ids" eval="[(4,ref('print_on_demand.custom_area_1'),0)]" />
+            <field name="is_print_on_demand" eval="True" />
+      </record>
+
+</odoo>

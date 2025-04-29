@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <template id="print_on_demand.design_content_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <div class="page">
+                <span t-if="doc.text" t-esc="doc.text" t-options="{'widget':'html'}"></span>
+                <img t-if="doc.image" t-att-src="image_data_uri(doc.image)" alt=""/>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <record id="action_report_print_on_demand_design" model="ir.actions.report">
+        <field name="name">Design content</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="model">line.custom.design</field>
+        <field name="report_name">print_on_demand.design_content_report_template</field>
+        <field name="print_report_name"> object.line_id.order_id.name</field>
+    </record>
+</odoo>

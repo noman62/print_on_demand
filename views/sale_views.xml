@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+
+    <record id="sale_order_line_view_form_web" model="ir.ui.view">
+        <field name="name">sale.order.line.view.form.webtoprint</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <form duplicate="false" create="false">
+                <header>
+                    <field name="state" widget="statusbar" />
+                </header>
+                <sheet>
+                    <div class="oe_title">
+                        <h1>
+                            <field name="display_name" readonly="1"/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                                <field name="order_id" readonly="1"/>
+                                <field name="product_id" readonly="1"/>
+                                <field name="name" readonly="1"/>
+                                <field name="product_uom_qty" readonly="1"/>
+                                <field name="qty_delivered" readonly="1"/>
+                                <field name="qty_invoiced"/>
+                                <field name="product_uom" readonly="1"/>
+                                <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                                <field name="order_partner_id" invisible="1"/>
+                                <field name="display_type" invisible="1"/>
+                                <field name="product_updatable" invisible="1"/>
+                            </group>
+                            <group>
+                                <field name="price_unit" readonly="1"/>
+                                <field name="discount" groups="product.group_discount_per_so_line" readonly="1"/>
+                                <field name="price_subtotal" widget="monetary"/>
+                                <field name="tax_id" widget="many2many_tags" readonly="1"/>
+                                <field name="price_tax" widget="monetary"/>
+                                <field name="price_total" widget="monetary"/>
+                                <field name="currency_id" invisible="1"/>
+                            </group>
+                    </group>
+                    <separator string="Print On Demand Design"/>
+                    <center>
+                        <field string="Design Lines" name="design_line_ids" readonly="1"/>
+                    </center>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="line_custom_design_view_tree" model="ir.ui.view">
+        <field name="name">line.custom.view.tree.webtoprint</field>
+        <field name="model">line.custom.design</field>
+        <field name="arch" type="xml">
+            <tree string="Design Lines">
+                <field name="name" string="Design"/>
+                <field name="image_name" column_invisible="1" />
+                <field name="image" widget="download" filename="image_name" string="Image" />
+                <field name="text" widget="html" />
+                <field name="printing_type" string="Printing Type"/>
+                <field name="number_of_colors" string="Number of Colors" invisible="number_of_colors == 0"/>
+                <field name="player_list"/>
+                <button   string="Download preview"   name="action_download_design" type="object" class="oe_highlight" />
+                <button  string="Download content"  name="action_report_design_content" type="object" class="oe_highlight"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="line_custom_design_view_form" model="ir.ui.view">
+        <field name="name">line.custom.design.view.form</field>
+        <field name="model">line.custom.design</field>
+        <field name="arch" type="xml">
+            <form string="Design">
+                <header>
+                        <button icon="fa-download" string="Download preview" name="action_download_design" type="object" class="oe_highlight"/>
+                        <button icon="fa-download" string="Download content" name="action_report_design_content" type="object" class="oe_highlight"/>
+                    </header>
+                <sheet>
+                    <!-- <div class="oe_title">
+                        <label class="oe_edit_only" for="name" string="Name"/>
+                        <h1><field name="name" /></h1>
+                    </div> -->
+                    
+                        <center>
+                            <field options="{'size':[400,400]}" name="design" widget="image"/>
+                        </center>
+                    
+                    <!-- <group> -->
+                        <div  string="Design Content">
+                            <group string="Text" invisible="text == False">
+                                <field name="text"  />
+                            </group>
+                            <group string="Player List" invisible="player_list == False">
+                                <field name="player_list"/>
+                            </group>
+                            <newline/>
+                            
+                        </div>
+                        <group string="Image" invisible="image == False">
+                                 <field name="image_name" invisible="1" />
+                                 <field nolabel="0" name="image" filename="image_name" />
+                                <!-- <field name="image" widget="image"  /> -->
+                            </group>
+                    <!-- </group> -->
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="sale_order_line_view_tree_web" model="ir.ui.view">
+        <field name="name">sale.order.line.view.tree</field>
+        <field name="model">sale.order.line</field>
+        <field name="arch" type="xml">
+            <tree string="Sales Order Lines"  decoration-info="(not display_type and invoice_status == 'to invoice')" create="false" default_order='create_date desc' >
+                <field name="sequence" widget="handle"/>
+                <!-- We do not display the type because we don't want the user to be bothered with that information if he has no section or note. -->
+                <field name="display_type" column_invisible="1"/>
+                <field name="product_uom_category_id" column_invisible="1"/>
+                <field name="order_id" />
+                <field name="product_updatable" column_invisible="1"/>
+                <field name="product_id" readonly="product_updatable == False" required="display_type == False" options="{'no_open': True}" force_save="1" context="{'partner_id': parent.partner_id,   'quantity': product_uom_qty,   'pricelist': parent.pricelist_id,   'uom':product_uom,  'company_id': parent.company_id,  'default_lst_price': price_unit,   'default_description_sale': name  }" domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" widget="product_configurator"/>
+                <field name="product_template_id" string="Product" column_invisible="1"  readonly="product_updatable == False" required="display_type == False" options="{'no_open': True}" context="{'partner_id': parent.partner_id,     'quantity': product_uom_qty, 'pricelist': parent.pricelist_id, 'uom':product_uom, 'company_id': parent.company_id, 'default_list_price': price_unit, 'default_description_sale': name }" domain="[('sale_ok', '=', True), '|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]" widget="product_configurator"/>
+                <field name="name" column_invisible="1"/>
+                <!-- <field name="analytic_tag_ids" optional="hide" groups="analytic.group_analytic_tags" widget="many2many_tags" options="{'color_field': 'color'}" domain="['|', ('company_id', '=', False), ('company_id', '=', parent.company_id)]"/> -->
+                <field name="product_uom_qty" context="{   'partner_id': parent.partner_id, 'quantity': product_uom_qty, 'pricelist': parent.pricelist_id,  'uom': product_uom,     'company_id': parent.company_id       }"/>
+                <field name="qty_delivered" string="Delivered"  readonly="qty_delivered_method != 'manual'" optional="show"/>
+                <!-- <field name="qty_delivered_manual" invisible="1"/> -->
+                <field name="qty_delivered_method" column_invisible="1"/>
+                <field name="qty_invoiced" string="Invoiced"  optional="show"/>
+                <field name="qty_to_invoice" column_invisible="1"/>
+                <field name="product_uom" force_save="1" string="UoM" readonly="state in ('sale','done', 'cancel')" required="display_type == False" context="{'company_id': parent.company_id}"  options="{&quot;no_open&quot;: True}" optional="show"/>
+                <!-- <field name="customer_lead" optional="hide" readonly="parent.state not in ['draft', 'sent']"/> -->
+                <field name="price_unit" readonly="qty_invoiced &gt; 0" />
+                <field name="tax_id" widget="many2many_tags" options="{'no_create': True}" domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]" readonly="qty_invoiced &gt; 0" optional="show"/>
+                <field name="discount" string="Disc.%" groups="product.group_discount_per_so_line" optional="show"/>
+                <field name="price_subtotal" widget="monetary" />
+                <field name="price_total" widget="monetary" />
+                <field name="state" column_invisible="1"/>
+                <field name="invoice_status" column_invisible="1"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="price_tax" column_invisible="1"/>
+                <field name="company_id" column_invisible="1"/>
+                <field name="state" />
+            </tree>
+        </field>
+    </record>
+    <record id="view_order_form_inherit_print_on_demand" model="ir.ui.view">
+        <field name="name">sale.order.view.form.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='order_line']//tree//field[@name='product_id']" position="before">
+                <field name="print_on_demand_line" column_invisible="1" />
+                <button string="View Design" class="oe_highlight" style="color:black;" invisible="print_on_demand_line == False" name="action_url_print_on_demand_design"  type="object"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="print_on_demand_sol_action" model="ir.actions.act_window">
+        <field name="name">Orders</field>
+        <field name="res_model">sale.order.line</field>
+        <!-- <field name="views" eval="[['print_on_demand.sale_order_line_view_tree_web','tree'],['print_on_demand.sale_order_line_view_form_web','form']]"/> -->
+        <field name="domain">[('print_on_demand_line','=',True)]</field>
+        <field name="view_ids" eval="
+            [(5,0,0),(0,0,{'sequence': 1, 'view_mode': 'tree', 'view_id': ref('print_on_demand.sale_order_line_view_tree_web')}),
+            (0,0,{'sequence': 3, 'view_mode': 'form', 'view_id': ref('sale_order_line_view_form_web')})
+            ]
+        " />
+    </record>
+    <!-- <record model="ir.actions.act_window.view" id="print_on_demand_action_tree_sol">
+        <field name="sequence" eval="19"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="print_on_demand.sale_order_line_view_tree_web"/>
+        <field name="act_window_id" ref="print_on_demand.print_on_demand_sol_action"/>
+    </record> -->
+
+    <menuitem id="print_on_demand_menu"
+              name="Print On Demand"
+              web_icon="print_on_demand,static/description/icon.png"
+              sequence="1"/>
+    <!-- <menuitem
+        id="print_on_demand_menu"
+        name="Print On Demand"
+        parent="website.menu_website_configuration"
+        sequence="10"/> -->
+    <menuitem
+            id="print_on_demand_sale_order_line_menu"
+            name="Orders"
+            action="print_on_demand_sol_action"
+            parent="print_on_demand_menu"
+            sequence="10"/>
+</odoo>
