@@ -468,7 +468,7 @@
                             <i class="fa fa-eye"></i>
                             Preview
                         </button>
-                        <button id="add-to-cart-top" class="btn btn-primary">
+                        <button id="add-to-cart" class="btn btn-primary">
                             <i class="fa fa-shopping-cart"></i>
                             Add to Cart
                         </button>

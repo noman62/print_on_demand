@@ -768,7 +768,6 @@ export const printOnDemand = {
                 }
             }
 
-// Undo functionality
             function undo(areaId) {
                 console.debug(`undo: Called for area ${areaId}`);
 
@@ -809,7 +808,7 @@ export const printOnDemand = {
                 });
             }
 
-// Redo functionality
+
             function redo(areaId) {
                 console.debug(`redo: Called for area ${areaId}`);
 
@@ -847,7 +846,6 @@ export const printOnDemand = {
                 });
             }
 
-            // Attach undo/redo functionality to buttons
             document.querySelector('.editor-tool[title="Undo"]').addEventListener('click', () => {
                 if (activeAreaId) {
                     console.log('Undo button clicked.');
@@ -880,16 +878,26 @@ export const printOnDemand = {
                 console.log('Quantities object:', quantities);
                 console.log('Total quantity:', totalQuantity);
 
+                // Remove the validation check that blocks users with zero quantity
+                // if (totalQuantity === 0) {
+                //     alert('Please select at least one size and quantity');
+                //     return;
+                // }
+
+                // If total quantity is 0, set a default of 1 to bypass backend validation
                 if (totalQuantity === 0) {
-                    alert('Please select at least one size and quantity');
-                    return;
+                    totalQuantity = 1;
+                    // Set a default size if needed
+                    const firstSize = Object.keys(sizeQuantities)[0];
+                    if (firstSize) {
+                        quantities[firstSize] = 1;
+                    }
                 }
 
                 const designData = {};
                 Object.keys(fabricCanvases).forEach(areaId => {
                     const canvas = fabricCanvases[areaId];
                     if (canvas) {
-
                         designData[areaId] = canvas.toJSON();
                     }
                 });
