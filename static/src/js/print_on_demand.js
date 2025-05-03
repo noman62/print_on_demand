@@ -864,9 +864,11 @@ export const printOnDemand = {
 
 
             document.getElementById('add-to-cart').addEventListener('click', function () {
+                // Use the quantities from our global object
                 let totalQuantity = 0;
                 const quantities = {};
 
+                // Process our saved quantities
                 Object.keys(sizeQuantities).forEach(size => {
                     const quantity = sizeQuantities[size] || 0;
                     if (quantity > 0) {
@@ -878,46 +880,44 @@ export const printOnDemand = {
                 console.log('Quantities object:', quantities);
                 console.log('Total quantity:', totalQuantity);
 
-                // Remove the validation check that blocks users with zero quantity
-                // if (totalQuantity === 0) {
-                //     alert('Please select at least one size and quantity');
-                //     return;
-                // }
-
-                // If total quantity is 0, set a default of 1 to bypass backend validation
+                // Check if at least one size has a quantity
                 if (totalQuantity === 0) {
-                    totalQuantity = 1;
-                    // Set a default size if needed
-                    const firstSize = Object.keys(sizeQuantities)[0];
-                    if (firstSize) {
-                        quantities[firstSize] = 1;
-                    }
+                    alert('Please select at least one size and quantity');
+                    return;
                 }
 
+                // Collect design data from all custom areas
                 const designData = {};
                 Object.keys(fabricCanvases).forEach(areaId => {
                     const canvas = fabricCanvases[areaId];
                     if (canvas) {
+                        // Convert canvas to JSON for storage
                         designData[areaId] = canvas.toJSON();
                     }
                 });
 
+                // Create a form to submit the data
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/shop/cart/update';
+
+                // Add product_id field
                 const productIdInput = document.createElement('input');
                 productIdInput.type = 'hidden';
                 productIdInput.name = 'product_id';
+                // Extract product ID from URL or data attribute
                 const productId = getProductId();
                 productIdInput.value = productId;
                 form.appendChild(productIdInput);
 
+                // Add quantity field (total quantity)
                 const quantityInput = document.createElement('input');
                 quantityInput.type = 'hidden';
                 quantityInput.name = 'add_qty';
                 quantityInput.value = totalQuantity;
                 form.appendChild(quantityInput);
 
+                // Add custom_design field to store design data
                 const customDesignInput = document.createElement('input');
                 customDesignInput.type = 'hidden';
                 customDesignInput.name = 'custom_design';
@@ -927,6 +927,7 @@ export const printOnDemand = {
                 });
                 form.appendChild(customDesignInput);
 
+                // Add CSRF token if needed
                 if (window.csrf_token) {
                     const csrfInput = document.createElement('input');
                     csrfInput.type = 'hidden';
@@ -935,10 +936,10 @@ export const printOnDemand = {
                     form.appendChild(csrfInput);
                 }
 
+                // Submit the form
                 document.body.appendChild(form);
                 form.submit();
             });
-
             document.getElementById('preview-design')?.addEventListener('click', function () {
                 alert('Preview functionality is not yet implemented');
             });
